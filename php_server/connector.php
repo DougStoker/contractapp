@@ -1,5 +1,15 @@
 <?php
 header('Content-Type: application/json');
+
+
+// Temporary shortcircuit
+
+$jdata = file_get_contents('./contractors.json');
+
+echo $jdata;
+
+exit;
+
 $mysqli = new mysqli('127.0.0.1', 'root', 'password', 'contractorsdb');
 
 

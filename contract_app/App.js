@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -57,7 +57,7 @@ getdata = () => {
 const getDataAsync = async () => {
     try {
         let response = await fetch(
-            'http://192.168.1.1:8000/connector.php'
+            'http://localhost:8000/connector.php'
             );
             let json = await response.json();
             return json;
@@ -66,8 +66,6 @@ const getDataAsync = async () => {
         }
 };
     
-let data = getDataAsync()
-
 
 const Tile = (t) => {
   return(
@@ -77,19 +75,32 @@ const Tile = (t) => {
     );
 };
 
-const TileArray = () => {
+function TileArray(props){
     let a = []
-    for(d of getDataAsync()){
+    const data = props.children
+    //console.warn("Data: ",data.length)
+    if (data.length > 0) {
+    for(let d of data){
         a.push(Tile(JSON.stringify(d)));
     }
+  }
     return a;
 }
 
-
-
-
 const App: () => React$Node = () => {
-    console.warn(data)
+
+  const [data, setData] = useState([]) 
+
+  useEffect(() => {
+    // can't use async on a useEffect, so we embed our work inside a new function
+    const fetchData = async() => {
+      const result = await getDataAsync()
+      setData(result)
+    }
+    // then call the function
+    fetchData();
+  }, [])
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -104,7 +115,7 @@ const App: () => React$Node = () => {
             </View>
           )}
           <View style={styles.body}>
-            <TileArray></TileArray>   
+            <TileArray>{data}</TileArray>   
           </View>
         </ScrollView>
       </SafeAreaView>
